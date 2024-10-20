@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Search Visualization</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Cinzel+Decorative:400,900);
+
+        body {
+            background: linear-gradient(135deg, rgb(9, 9, 27) 0%, rgb(39, 8, 39) 50%, rgb(92, 84, 84) 100%);
+            font-family: 'Arial', sans-serif;
+            position: relative; /* Set position to relative for child absolute positioning */
+        }
+        h1 {
+            text-shadow: -1px;
+            font-family: 'Arial', sans-serif;
+            position: absolute; /* Positioning title */
+            top: 20px; /* Distance from the top */
+            left: 20px; /* Distance from the left */
+            color: white;
+        }
+        .input-container {
+            position: absolute; /* Positioning input containers */
+            top: 80px; /* Adjust as necessary */
+            left: 20px; /* Adjust as necessary */
+        }
+        .array-container {
+            display: flex;
+            flex-wrap: wrap; /* Allows the items to wrap to the next line */
+            justify-content: flex-start; /* Aligns items to the left */
+            margin-top: 250px; /* Increased margin-top for more space below inputs */
+            margin-bottom: 2rem; /* Added margin for spacing */
+            max-width: 80%; /* Set a max width to the container */
+            padding: 0 20px; /* Add padding to prevent overflow */
+        }
+        .array-item {
+            transition: background-color 0.3s, transform 0.3s, opacity 0.3s;
+            margin: 0.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px; /* Fixed width */
+            height: 50px; /* Fixed height */
+            border: 2px solid #2563eb;
+            background-color: white;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .highlight {
+            background-color: #2563eb; /* General highlight color */
+            color: #fff;
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        .match-highlight {
+            background-color: #28a745; /* Green for match */
+            color: white;
+        }
+        .left-highlight {
+            background-color: #dc3545; /* Red for left index */
+            color: white;
+        }
+        .right-highlight {
+            background-color: orange; /* Blue for right index */
+            color: white;
+        }
+        .container-highlight {
+            background-color: #e0f2fe;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: background-color 0.3s;
+        }
+        .button {
+            font-family: 'Arial', sans-serif;
+            border: 1px solid gray;
+            color: white;
+            padding: 2.5px 4px;
+            text-align: center;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .button:hover {
+            background-color: #2a1879;
+            transition-duration: .4s;
+        }
+        input {
+            font-family: 'Arial', sans-serif !important;
+            font-size: 16px !important;
+        }
+        .code-container {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px; /* Adjusted margin from the top */
+            position: absolute; /* Positioning the code snippet */
+            right: 20px; /* Positioning the code snippet */
+            top: 20px; /* Adjusting vertical position */
+            width: auto; /* Allow width to adjust based on content */
+            max-width: 550px; /* Optional max width */
+            z-index: 5; /* Ensure it appears above other elements */
+        }
+    </style>
+</head>
+<body class="flex flex-col items-start justify-start min-h-screen relative">
+
+    <h1 class="text-3xl font-bold mb-8">Binary Search Visualization</h1>
+    <div class="input-container">
+        <input type="text" id="arrayInput" placeholder="Enter numbers separated by commas (e.g. 4,3,2,1)" class="p-2 border border-gray-300 rounded mb-4 w-96" />
+        <input type="number" id="searchInput" placeholder="Search Number" class="p-2 border border-gray-300 rounded mb-4 w-40" />
+        <div class="flex space-x-4">
+            <button id="binarySearchButton" class="button bg-green-500 text-white py-2 px-4 rounded">Binary Search</button>
+        </div>
+    </div>
+
+    <div class="array-container flex justify-center mb-6" id="arrayContainer"></div>
+    <div class="iteration-info mt-4 text-lg text-white" id="iterationInfo"></div>
+
+    <div class="code-container">
+        <pre class="code-snippet p-4 text-black rounded-lg overflow-x-auto bg-gray-100">
+            <code id="codeSnippet" class="language-javascript">
+int binarySearch(int array[], int size, int toBeSearch) {
+    int left = 0;
+    int right = size - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (toBeSearch == array[mid]) {
+            return mid; // Element found
+        }
+        if (toBeSearch > array[mid]) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return -1; // Element not found
+}
+            </code>
+        </pre>
+    </div>
+
+    <script>
+        // Original binary search function code in C-style
+        const originalCode = `
+int binarySearch(int array[], int size, int toBeSearch) {
+    int left = 0;
+    int right = size - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (toBeSearch == array[mid]) {
+            return mid; // Element found
+        }
+        if (toBeSearch > array[mid]) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return -1; // Element not found
+}`;
+
+        // Binary Search Algorithm
+        function binarySearch(array, size, toBeSearch) {
+            let left = 0;
+            let right = size - 1;
+            const iterations = [];
+
+            while (left <= right) {
+                const mid = left + Math.floor((right - left) / 2);
+                iterations.push({ left, mid, right, value: array[mid] });
+
+                // Check if the element is present at mid
+                if (toBeSearch === array[mid]) {
+                    return { index: mid, iterations };
+                }
+
+                // If the element is greater, ignore the left half
+                if (toBeSearch > array[mid]) {
+                    left = mid + 1;
+                } else {
+                    // If the element is smaller, ignore the right half
+                    right = mid - 1;
+                }
+            }
+            return { index: -1, iterations };
+        }
+
+        // Function to visualize binary search
+        function visualizeBinarySearch() {
+    const arrayInput = document.getElementById('arrayInput').value;
+    const searchInput = parseInt(document.getElementById('searchInput').value);
+    const arrayContainer = document.getElementById('arrayContainer');
+    const iterationInfo = document.getElementById('iterationInfo');
+
+    // Clear previous results
+    iterationInfo.innerHTML = ''; // Clear previous results
+    arrayContainer.innerHTML = ''; // Clear the displayed array
+
+    // Sort the input array
+    const array = arrayInput.split(',').map(Number).sort((a, b) => a - b);
+
+    const searchResult = binarySearch(array, array.length, searchInput);
+    let currentIteration = 0;
+
+    // Create array elements and control line break after 10 elements
+    array.forEach((num, index) => {
+        const item = document.createElement('div');
+        item.className = 'array-item';
+        item.innerHTML = num;
+        arrayContainer.appendChild(item);
+
+        // Break line after 10 elements
+        if ((index + 1) % 10 === 0) {
+            const lineBreak = document.createElement('div');
+            lineBreak.style.flexBasis = '100%'; // Force break to the next line
+            arrayContainer.appendChild(lineBreak);
+        }
+    });
+
+    const displayIteration = async () => {
+        if (currentIteration < searchResult.iterations.length) {
+            const { left, mid, right, value } = searchResult.iterations[currentIteration];
+
+            // Highlight the current array element
+            const elements = document.querySelectorAll('.array-item');
+
+            // Clear previous highlights
+            elements.forEach(element => {
+                element.classList.remove('highlight', 'left-highlight', 'right-highlight', 'match-highlight');
+            });
+
+            // Apply specific highlights
+            if (value === searchInput) {
+                elements[mid].classList.add('match-highlight');
+                iterationInfo.innerHTML = `<br><span style="text-align: center; display: block;">Match found at index ${mid}</span>`;
+            } else {
+                elements[mid].classList.add('highlight');
+            }
+
+            // Highlight the left and right indices
+            if (left < array.length) {
+                elements[left].classList.add('left-highlight');
+            }
+            if (right >= 0) {
+                elements[right].classList.add('right-highlight');
+            }
+
+            // Modify the code snippet dynamically for the current iteration
+            let modifiedCode = originalCode
+                .replace(/toBeSearch/g, searchInput)
+                .replace(/array\[mid\]/g, `array[${mid}] (${value})`)
+                .replace(/left/g, left)
+                .replace(/right/g, right);
+
+            // Highlight the modified code
+            document.getElementById('codeSnippet').innerHTML = modifiedCode
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/`/g, "&grave;");
+
+            currentIteration++;
+            setTimeout(displayIteration, 2000);
+        } else if (searchResult.index === -1) {
+            iterationInfo.innerHTML += `<br><span style="text-align: center; display: block;">Result: Element not found</span>`;
+        }
+    };
+
+    displayIteration();
+}
+
+
+        // Event listener
+        document.getElementById('binarySearchButton').addEventListener('click', visualizeBinarySearch);
+    </script>
+</body>
+</html>
